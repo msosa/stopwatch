@@ -102,7 +102,7 @@ function Timer({onNewLap}: TimerProps) {
 	useEffect(() => {
 		document.addEventListener("touchstart", onTouch)
 		return () => document.removeEventListener("touchstart", onTouch)
-	});
+	}, [onTouch]);
 
 	return (
 		<div className="time">
