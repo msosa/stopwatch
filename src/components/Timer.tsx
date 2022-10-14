@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useReducer} from "react";
+import React, {useCallback, useEffect, useReducer, useState} from "react";
 import "./Timer.css";
 
 interface TimerProps {
@@ -22,6 +22,8 @@ const initialState: TimerState = {
 	currentTime: "0:00"
 };
 
+const isSupported = typeof window !== 'undefined' && 'wakeLock' in navigator && navigator.wakeLock.request;
+
 function calculateLap(startLap: number, currentTime: number): string {
 	const time = Math.floor((currentTime - startLap) / 1000)
 	const seconds = time % 60
@@ -44,6 +46,8 @@ function reducer(state: TimerState, action: TimerAction): TimerState {
 
 function Timer({onNewLap}: TimerProps) {
 	const [state, dispatch] = useReducer(reducer, initialState);
+	const [wakeLockSentinel, setWakeLockSentinel] = useState<WakeLockSentinel>();
+	const [isDestroyed, setIsDestroyed] = useState<boolean>(false);
 
 	useEffect(() => {
 		dispatch(TimerAction.initialize)
@@ -51,19 +55,55 @@ function Timer({onNewLap}: TimerProps) {
 			dispatch(TimerAction.increment)
 		}, 20)
 		return () => clearInterval(intervalId)
-	},[])
+	}, [])
+
+	const newLapStart = useCallback(() => {
+		onNewLap(state.currentTime)
+		dispatch(TimerAction.initialize)
+	}, [onNewLap, state.currentTime])
 
 	const onKeyDown = useCallback((event: KeyboardEvent) => {
 		if (event.code === 'Space') {
-			onNewLap(state.currentTime)
-			dispatch(TimerAction.initialize)
+			newLapStart()
 		}
-	}, [onNewLap, state.currentTime])
+	}, [newLapStart])
 
 	useEffect(() => {
 		document.addEventListener("keydown", onKeyDown);
 		return () => document.removeEventListener("keydown", onKeyDown)
 	}, [onKeyDown])
+
+	useCallback(async () => {
+		if (isDestroyed) {
+			isSupported && (await wakeLockSentinel?.release().then(() => console.log("release")));
+		}
+	}, [isDestroyed, wakeLockSentinel])
+
+	useEffect(() => {
+		const wakeLockAsync = async () => {
+			if (isSupported) {
+				navigator.wakeLock.request('screen')
+					.then(sentinel => {
+						setWakeLockSentinel(sentinel)
+					})
+					.catch(console.log)
+			}
+		}
+
+		wakeLockAsync().catch(console.log)
+		return () => setIsDestroyed(true)
+	}, [])
+
+	const onTouch = useCallback((event: Event) => {
+		event.preventDefault();
+		newLapStart()
+	}, [newLapStart])
+
+	useEffect(() => {
+		document.addEventListener("touchstart", onTouch)
+		return () => document.removeEventListener("touchstart", onTouch)
+	});
+
 	return (
 		<div className="time">
 			{state.currentTime}
