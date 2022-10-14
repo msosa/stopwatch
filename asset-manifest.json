@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/stopwatch/static/css/main.7568d32d.css",
-    "main.js": "/stopwatch/static/js/main.96ee8e6c.js",
+    "main.js": "/stopwatch/static/js/main.6fc7d74d.js",
     "static/js/787.ba6f0fa1.chunk.js": "/stopwatch/static/js/787.ba6f0fa1.chunk.js",
     "index.html": "/stopwatch/index.html",
     "main.7568d32d.css.map": "/stopwatch/static/css/main.7568d32d.css.map",
-    "main.96ee8e6c.js.map": "/stopwatch/static/js/main.96ee8e6c.js.map",
+    "main.6fc7d74d.js.map": "/stopwatch/static/js/main.6fc7d74d.js.map",
     "787.ba6f0fa1.chunk.js.map": "/stopwatch/static/js/787.ba6f0fa1.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.7568d32d.css",
-    "static/js/main.96ee8e6c.js"
+    "static/js/main.6fc7d74d.js"
   ]
 }
